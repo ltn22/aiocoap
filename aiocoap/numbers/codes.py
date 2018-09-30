@@ -89,6 +89,10 @@ class Code(ExtensibleIntEnum):
         checked for strictly, but used as an indicator."""
         return self.is_response() or self in (self.POST, self.PUT, self.FETCH, self.PATCH, self.iPATCH)
 
+    def get_class(self):
+        """ return the class (2, 4 or 5) """
+        return self >> 5
+
     @property
     def dotted(self):
         """The numeric value three-decimal-digits (c.dd) form"""

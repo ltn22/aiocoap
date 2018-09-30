@@ -461,6 +461,16 @@ class Context(interfaces.RequestProvider):
 
         response = await self.serversite.render(request)
 
+        if response.opt.no_response != None:
+            # no option value never reply
+            if response.opt.no_response == 0: return
+            #check bitmap for code class bit set to 1
+            code_class = response.code.get_class()
+            if (0x01 << code_class) & response.opt.no_response != 0:
+                return
+
+
+
         if response.code is None or not response.code.is_response():
             self.log.warning("Response does not carry response code (%r),"
                              " application probably violates protocol.",

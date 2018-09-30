@@ -25,6 +25,7 @@ media_types = {0: 'text/plain',
                50: 'application/json',
                51: 'application/json-patch+json',
                52: 'application/merge-patch+json',
+               60: 'application/cbor',
                64: 'application/link-format+cbor', # draft-ietf-core-links-json-10
                70: 'application/oscon', # draft-ietf-core-object-security-01
                504: 'application/link-format+json', # draft-ietf-core-links-json-10
