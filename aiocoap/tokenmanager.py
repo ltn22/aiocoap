@@ -197,8 +197,12 @@ class TokenManager(interfaces.RequestInterface, interfaces.TokenManager):
         # Still, it would be an option not to send an is_last here and *always*
         # have the higher-level code indicate loss of interest in that exchange
         # when it detects that no more observations will follow.
+        # Keep the observe registration alive as long as the request had
+        # observe=0 and the response was successful — even if the server
+        # didn't echo the Observe option (some implementations omit it on
+        # the first 2.05 but still send subsequent notifications).
         final = not (
-            request.request.opt.observe == 0 and response.opt.observe is not None
+            request.request.opt.observe == 0 and response.code.is_successful()
         )
 
         if final:

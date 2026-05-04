@@ -735,16 +735,21 @@ class Request(interfaces.Request, BaseUnicastRequest):
             return
 
         if first_event.message.opt.observe is None:
-            self.log.error(
-                "Pipe indicated more possible responses"
-                " while the Request handler would not know what to"
-                " do with them, stopping any further request."
-            )
-            self.log.debug("_run exit: opt.observe is None on first response")
-            self._stop_interest()
-            return
+            if self._pipe.request.opt.observe != 0:
+                self.log.error(
+                    "Pipe indicated more possible responses"
+                    " while the Request handler would not know what to"
+                    " do with them, stopping any further request."
+                )
+                self.log.debug("_run exit: opt.observe is None on first response")
+                self._stop_interest()
+                return
+            # Server omitted Observe option on first response but we requested
+            # observation; keep going and accept subsequent notifications.
+            self.log.debug("_run: server omitted Observe on first response, continuing anyway")
 
         # variable names from RFC7641 Section 3.4
+        # v1 may be None when the server omitted Observe on the first response
         v1 = first_event.message.opt.observe
         t1 = time.time()
 
@@ -782,15 +787,19 @@ class Request(interfaces.Request, BaseUnicastRequest):
                 v2 = next_event.message.opt.observe
                 t2 = time.time()
 
-                is_recent = (
-                    (v1 < v2 and v2 - v1 < 2**23)
-                    or (v1 > v2 and v1 - v2 > 2**23)
-                    or (
-                        t2
-                        > t1
-                        + self._pipe.request.transport_tuning.OBSERVATION_RESET_TIME
+                if v1 is None:
+                    # first response had no Observe option; accept unconditionally
+                    is_recent = True
+                else:
+                    is_recent = (
+                        (v1 < v2 and v2 - v1 < 2**23)
+                        or (v1 > v2 and v1 - v2 > 2**23)
+                        or (
+                            t2
+                            > t1
+                            + self._pipe.request.transport_tuning.OBSERVATION_RESET_TIME
+                        )
                     )
-                )
                 if is_recent:
                     t1 = t2
                     v1 = v2
