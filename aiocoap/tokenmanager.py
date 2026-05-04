@@ -179,26 +179,11 @@ class TokenManager(interfaces.RequestInterface, interfaces.TokenManager):
         if key not in self.outgoing_requests:
             # maybe it was a multicast...
             key = (response.token, None)
-        if key not in self.outgoing_requests:
-            # Fallback: token-only match for observe notifications (e.g. FETCH+observe
-            # where the stored remote may differ from the notification's source remote).
-            token_matches = [k for k in self.outgoing_requests if k[0] == response.token and k[1] is not None]
-            if len(token_matches) == 1:
-                self.log.debug(
-                    "Matched response by token only (remote stored=%r incoming=%r)",
-                    token_matches[0][1], response.remote,
-                )
-                key = token_matches[0]
 
         try:
             request = self.outgoing_requests[key]
         except KeyError:
             self.log.info("Response %r could not be matched to any request", response)
-            self.log.debug(
-                "outgoing_requests has %d entries: %s",
-                len(self.outgoing_requests),
-                [(k[0].hex(), repr(k[1])) for k in self.outgoing_requests],
-            )
             return False
         else:
             self.log.debug("Response %r matched to request %r", response, request)

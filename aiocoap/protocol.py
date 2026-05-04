@@ -934,7 +934,8 @@ class BlockwiseRequest(BaseUnicastRequest, interfaces.Request):
                 blockresponse.remote.maximum_block_size_exp = (
                     app_request.remote.maximum_block_size_exp
                 )
-            app_request.remote = blockresponse.remote
+            if app_request.opt.observe is None:
+                app_request.remote = blockresponse.remote
 
             if blockresponse.opt.block1 is None:
                 if blockresponse.code.is_successful() and current_block1.opt.block1:
