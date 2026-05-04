@@ -726,9 +726,11 @@ class Request(interfaces.Request, BaseUnicastRequest):
                     " do with them, stopping any further request."
                 )
                 self._stop_interest()
+            self.log.debug("_run exit: observation is None, is_last=%s", first_event.is_last)
             return
 
         if first_event.is_last:
+            self.log.debug("_run exit: first_event.is_last=True, opt.observe=%r", first_event.message.opt.observe if first_event.message else None)
             self.observation.error(error.NotObservable())
             return
 
@@ -738,6 +740,7 @@ class Request(interfaces.Request, BaseUnicastRequest):
                 " while the Request handler would not know what to"
                 " do with them, stopping any further request."
             )
+            self.log.debug("_run exit: opt.observe is None on first response")
             self._stop_interest()
             return
 
