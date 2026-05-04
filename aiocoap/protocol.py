@@ -726,11 +726,9 @@ class Request(interfaces.Request, BaseUnicastRequest):
                     " do with them, stopping any further request."
                 )
                 self._stop_interest()
-            self.log.debug("_run exit: observation is None, is_last=%s", first_event.is_last)
             return
 
         if first_event.is_last:
-            self.log.debug("_run exit: first_event.is_last=True, opt.observe=%r", first_event.message.opt.observe if first_event.message else None)
             self.observation.error(error.NotObservable())
             return
 
@@ -741,12 +739,10 @@ class Request(interfaces.Request, BaseUnicastRequest):
                     " while the Request handler would not know what to"
                     " do with them, stopping any further request."
                 )
-                self.log.debug("_run exit: opt.observe is None on first response")
                 self._stop_interest()
                 return
             # Server omitted Observe option on first response but we requested
             # observation; keep going and accept subsequent notifications.
-            self.log.debug("_run: server omitted Observe on first response, continuing anyway")
 
         # variable names from RFC7641 Section 3.4
         # v1 may be None when the server omitted Observe on the first response

@@ -254,12 +254,6 @@ class TokenManager(interfaces.RequestInterface, interfaces.TokenManager):
         self.outgoing_requests[key] = request
 
         def _remove_key():
-            import traceback
-            self.log.debug(
-                "on_interest_end fired for token=%s, removing from outgoing_requests\n%s",
-                key[0].hex(),
-                ''.join(traceback.format_stack()),
-            )
             self.outgoing_requests.pop(key, None)
 
         request.on_interest_end(_remove_key)
