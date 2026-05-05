@@ -811,14 +811,16 @@ class Request(interfaces.Request, BaseUnicastRequest):
                 return
 
             if next_event.message.opt.observe is None:
-                self.observation.error(error.ObservationCancelled())
-                self.log.error(
-                    "Pipe indicated more possible responses"
-                    " while the Request handler would not know what to"
-                    " do with them, stopping any further request."
-                )
-                self._stop_interest()
-                return
+                if self._pipe.request.opt.observe != 0:
+                    self.observation.error(error.ObservationCancelled())
+                    self.log.error(
+                        "Pipe indicated more possible responses"
+                        " while the Request handler would not know what to"
+                        " do with them, stopping any further request."
+                    )
+                    self._stop_interest()
+                    return
+                # Server omitted Observe option in notification; keep accepting
 
 
 class BlockwiseRequest(BaseUnicastRequest, interfaces.Request):
